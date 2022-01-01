@@ -2,35 +2,15 @@ package com.example.exchange.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AnswerInputModel {
-    @JsonProperty(value = "Id")
-    private Integer answerId;
-
-    @JsonProperty(value = "Content")
-    private String content;
-
+public class LikeQuestionInputModel {
     @JsonProperty(value = "UserId")
     private Integer userId;
 
     @JsonProperty(value = "QuestionId")
     private Integer questionId;
 
-
-    public Integer getAnswerId() {
-        return answerId;
-    }
-
-    public void setAnswerId(Integer answerId) {
-        this.answerId = answerId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
+    @JsonProperty(value = "Status")
+    private Integer status;
 
     public Integer getUserId() {
         return userId;
@@ -46,5 +26,13 @@ public class AnswerInputModel {
 
     public void setQuestionId(Integer questionId) {
         this.questionId = questionId;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

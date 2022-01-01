@@ -1,5 +1,7 @@
 package com.example.exchange.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,10 +9,11 @@ import java.util.List;
 
 @Entity(name = "question")
 public class Question {
-
+    @TableGenerator(name = "question_gen", initialValue = 1000000)
     @Id
-    @Column(name = "question_id")
-    private String questionId;
+//    @Column(name = "question_id")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "question_gen")
+    private Integer questionId;
 
     @Column(name = "content")
     private String content;
@@ -21,11 +24,18 @@ public class Question {
     @Column(name = "created_time")
     private Date createdTime;
 
+    @Column(name = "modified_time")
+    private Date modifiedTime;
+
     @Column(name = "score")
-    private int score;
+    private Integer score;
+
+    @Column(name = "view")
+    private Integer view;
 
     @ManyToOne
     @JoinColumn(name ="user_id")
+    @JsonManagedReference
     private User user;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -33,13 +43,15 @@ public class Question {
                 joinColumns = @JoinColumn(name = "question_id"),
                 inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @JsonManagedReference
     private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "question")
+    @JsonManagedReference
     private List<Answer> answers = new ArrayList<>();
 
     @OneToMany(mappedBy = "question")
-    private List<Vote> votes = new ArrayList<>();
+    private List<VoteQuestion> votes = new ArrayList<>();
 
     public void addTag(Tag tag){
         tags.add(tag);
@@ -49,11 +61,11 @@ public class Question {
         tags.remove(tag);
     }
 
-    public String getQuestionId() {
+    public Integer getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(String questionId) {
+    public void setQuestionId(Integer questionId) {
         this.questionId = questionId;
     }
 
@@ -81,11 +93,12 @@ public class Question {
         this.createdTime = createdTime;
     }
 
-    public int getScore() {
+    public Integer getScore() {
+
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(Integer score) {
         this.score = score;
     }
 
@@ -103,5 +116,37 @@ public class Question {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
+
+    public List<VoteQuestion> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(List<VoteQuestion> votes) {
+        this.votes = votes;
+    }
+
+    public Date getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(Date modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
+
+    public Integer getView() {
+        return view;
+    }
+
+    public void setView(Integer view) {
+        this.view = view;
     }
 }

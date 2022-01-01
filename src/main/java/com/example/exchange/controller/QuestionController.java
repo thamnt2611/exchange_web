@@ -1,37 +1,84 @@
 package com.example.exchange.controller;
 
-import com.example.exchange.model.AnswerInputModel;
-import com.example.exchange.model.QuestionInputModel;
-import com.example.exchange.model.VoteInputModel;
+import com.example.exchange.entity.Question;
+import com.example.exchange.entity.VoteQuestion;
+import com.example.exchange.model.*;
+import com.example.exchange.service.QuestionService;
+import com.example.exchange.service.VoteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class QuestionController {
-    @GetMapping("/questions")
-    public ResponseEntity<?> getAllQuestions(Pageable page){
-        return null;
+    @Autowired
+    private QuestionService service;
+
+    @Autowired
+    private VoteService voteService;
+
+    @GetMapping("/Question")
+    public ResponseEntity<?> getAllQuestions(){
+        List<Question> questions = service.findAllQuestions();
+        List<QuestionOutputModel> outputQuestions = new ArrayList<>();
+        for (Question question : questions){
+            QuestionOutputModel q = new QuestionOutputModel(question);
+            outputQuestions.add(q);
+        }
+        return ResponseEntity.ok().body(outputQuestions);
     }
+
+    @GetMapping("/Question/{questionId}/{userId}")
+    public ResponseEntity<?> getQuestionById(@PathVariable Integer questionId, @PathVariable Integer userId){
+        Question question = service.findQuestionById(questionId);
+        if (question == null){
+            return ResponseEntity.badRequest().body(new ResultMessageModel(false, "Bug"));
+        }
+        QuestionOutputModel outputQuestion = new QuestionOutputModel(question, userId);
+        return ResponseEntity.ok().body(outputQuestion);
+    }
+
+//    @GetMapping("/Question/{keyword}")
+//    public ResponseEntity<?> getQuestionById(@PathVariable String keyWord){
+//        Question question = service.findQuestionByKeyWord(keyWord);
+//        if (question == null){
+//            return ResponseEntity.badRequest().body(new ResultMessageModel(false, "Bug"));
+//        }
+//        QuestionOutputModel outputQuestion = new QuestionOutputModel(question, userId);
+//        return ResponseEntity.ok().body(outputQuestion);
+//    }
+
+    @PostMapping("/Question")
+    public ResponseEntity<?> askQuestion(@RequestBody QuestionInputModel input){
+        Question question = service.save(input);
+        return ResponseEntity.ok().body(question);
+    }
+
+    @PutMapping("/Question/like")
+    public ResponseEntity<?> likeQuestion(@RequestBody LikeQuestionInputModel input){
+        VoteQuestion vote = voteService.saveVoteQuestion(input);
+        return ResponseEntity.ok().body(vote);
+    }
+
+    @PutMapping("/users/{userId}/questions/{questionId}")
+    public ResponseEntity<?> editQuestion(@PathVariable String userId, @PathVariable String questionId, @RequestBody QuestionInputModel input){
+        Question question = service.update(Integer.parseInt(questionId), input);
+        return ResponseEntity.ok().body(question);
+    }
+
 
     @GetMapping("/questions/inactive")
     public ResponseEntity<?> getInactiveQuestions(Pageable page){
         return null;
     }
 
-    @GetMapping("/questions/{id}")
-    public ResponseEntity<?> getQuestionById(@PathVariable String id){
-        return null;
-    }
-
     @GetMapping("/questions/tagged/{tagName}")
     public ResponseEntity<?> getQuestionByTag(@PathVariable String tagName){
-        return null;
-    }
-
-    @PostMapping("/questions/ask")
-    public ResponseEntity<?> askQuestion(@RequestBody QuestionInputModel input){
         return null;
     }
 
@@ -42,11 +89,6 @@ public class QuestionController {
 
     @PutMapping("/questions/{id}")
     public ResponseEntity<?> editAnswer(@RequestBody AnswerInputModel input){
-        return null;
-    }
-
-    @PutMapping("/users/{userId}/questions/{questionId}")
-    public ResponseEntity<?> editQuestion(@PathVariable String userId, @PathVariable String questionId, @RequestBody QuestionInputModel input){
         return null;
     }
 
